@@ -16,7 +16,7 @@ function sendinblue_rules_get_lists() {
       }
     }
     // Stores in cache table and expires after 1 day.
-    cache_set('sendinblue_rules_lists', $data, 'cache',  REQUEST_TIME  + (3600 * 24));
+    cache_set('sendinblue_rules_lists', $lists, 'cache',  REQUEST_TIME  + (3600 * 24));
   }
 
   return $lists;
