@@ -1,0 +1,6 @@
+name = SendinBlue Rules
+description = Rules integration for SendinBlue
+core = 7.x
+
+dependencies[] = sendinblue
+dependencies[] = rules

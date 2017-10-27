@@ -1,0 +1,8 @@
+<?php
+
+
+function sendinblue_rules_get_client() {
+  $access_key = variable_get(SendinblueManager::ACCESS_KEY, '');
+  $api_url = SendinblueManager::API_URL;
+  return new SendinblueMailin($api_url, $access_key);
+}
