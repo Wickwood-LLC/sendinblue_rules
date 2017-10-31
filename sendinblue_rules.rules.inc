@@ -133,7 +133,7 @@ function sendinblue_add_user_to_list($account, $lists, $attributes) {
     $data['listid'][] = $list;
   }
   
-  $result = $mailin->post('user/createdituser', $data);
+  $result = $mailin->post('user/createdituser', json_encode($data));
   if (!isset($result['code']) || $result['code'] != 'success') {
     $names = array();
     foreach ($lists as $list_id) {
