@@ -9,9 +9,9 @@ function sendinblue_rules_get_lists() {
   }
   else {
     $mailin = sendinblue_rules_get_client();
-    $result = $mailin->get('list', NULL);
-    if (isset($result['code']) && $result['code'] == 'success') {
-      foreach ($result['data'] as $list_info) {
+    $result = $mailin->get('contacts/lists', NULL);
+    if (isset($result['lists'])) {
+      foreach ($result['lists'] as $list_info) {
         $lists[$list_info['id']] = $list_info;
       }
     }

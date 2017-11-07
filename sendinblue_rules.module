@@ -1,8 +1,34 @@
 <?php
 
+define('SENDINBLUE_API_V3_URL', 'https://api.sendinblue.com/v3');
+
+/**
+ * Implements hook_menu().
+ */
+function sendinblue_rules_menu() {
+  $items['admin/config/bwma'] = array(
+    'title' => 'BWMA Settings',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('bwma_admin_settings_form'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'includes/admin_page.inc',
+  );
+  $items['admin/config/system/sendinblue/api3'] = array(
+    'title' => 'API v3.0',
+    'description' => 'API v3.0 configurations.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('sendinblue_rules_admin_settings_form'),
+    'access arguments' => array('administer sendinblue'),
+    'file' => 'includes/sendinblue_rules.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 1,
+  );
+
+  return $items;
+}
 
 function sendinblue_rules_get_client() {
-  $access_key = variable_get(SendinblueManager::ACCESS_KEY, '');
-  $api_url = SendinblueManager::API_URL;
-  return new SendinblueMailin($api_url, $access_key);
+  $access_key = variable_get('sendinblue_rules_api_v3_key', '');
+  //  $api_url = SendinblueManager::API_URL;
+  return new SendinblueMailin(SENDINBLUE_API_V3_URL, $access_key);
 }

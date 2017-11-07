@@ -120,10 +120,11 @@ function sendinblue_rules_lists_options() {
 function sendinblue_add_user_to_list($account, $lists, $attributes) {
   module_load_include('inc', 'sendinblue_rules', 'includes/sendinblue_rules.list');
   $all_lists = sendinblue_rules_get_lists();
+  $success = false;
   
   $mailin = sendinblue_rules_get_client();
   $data = array();
-  $data['email'] = $account->mail;
+
   foreach ($attributes as $attribute) {
     $data['attributes'][$attribute['name']] = $attribute['value'];
   }
@@ -133,8 +134,20 @@ function sendinblue_add_user_to_list($account, $lists, $attributes) {
     $data['listid'][] = $list;
   }
   
-  $result = $mailin->post('user/createdituser', json_encode($data));
-  if (!isset($result['code']) || $result['code'] != 'success') {
+  $result = $mailin->get("contacts/{$account->mail}" , NULL);
+  if (isset($result['email'])) {
+    $data = array_replace_recursive($result, $data);
+    $result = $mailin->put("contacts/{$account->mail}" , $data);
+    // TODO: determine success.
+    $success = TRUE;
+  }
+  else {
+    $data['email'] = $account->mail;
+    $result = $mailin->post('contacts', json_encode($data));
+    $success = isset($result['id']);
+  }
+
+  if ($success) {
     $names = array();
     foreach ($lists as $list_id) {
       $names[] = "{$all_lists[$list_id]['name']} ($list_id)";
