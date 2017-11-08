@@ -83,6 +83,12 @@ function sendinblue_rules_rules_action_info() {
         'label' => t('Attributes'),
         'optional' => TRUE,
       ),
+      'updateEnabled' => array(
+        'type' => 'boolean',
+        'label' => t('Update enabled'),
+        'description' => t('Facilitate to update existing contact in same request.'),
+        'optional' => TRUE,
+      ),
     ),
     'group' => t('SendinBlue'),
   );
@@ -184,7 +190,7 @@ function sendinblue_rules_lists_options() {
   return $options;
 }
 
-function sendinblue_create_contact($account, $lists, $attributes) {
+function sendinblue_create_contact($account, $lists, $attributes, $updateEnabled) {
   $success = false;
   
   $mailin = sendinblue_rules_get_client();
@@ -198,7 +204,9 @@ function sendinblue_create_contact($account, $lists, $attributes) {
   foreach ($lists as $list) {
     $data['listid'][] = $list;
   }
-  
+  if ($updateEnabled === TRUE) {
+    $data['updateEnabled'] = TRUE;
+  }
 
   $data['email'] = $account->mail;
   $result = $mailin->post('contacts', json_encode($data));
