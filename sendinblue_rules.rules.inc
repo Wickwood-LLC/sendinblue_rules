@@ -69,7 +69,7 @@ function sendinblue_rules_rules_action_info() {
   $items = array();
 
   $items['sendinblue_create_contact'] = array(
-    'label' => t('Add a user to lists'),
+    'label' => t('Create contact'),
     'parameter' => array(
       'account' => array('type' => 'user', 'label' => t('Subscriber')),
       'lists' => array(
@@ -84,7 +84,26 @@ function sendinblue_rules_rules_action_info() {
     ),
     'group' => t('SendinBlue'),
   );
-  
+
+  $items['sendinblue_update_contact'] = array(
+    'label' => t('Update contact'),
+    'parameter' => array(
+      'email' => array('type' => 'text', 'label' => t('Email')),
+      'attributes' => array(
+        'type' => 'list<sendinblue_attribute>',
+        'label' => t('Attributes'),
+        'description' => t('Values of the attributes to fill. The attributes must exist in you contact database'),
+      ),
+      'listIds' => array(
+        'type' => 'list<text>',
+        'label' => t('Lists'),
+        'options list' => 'sendinblue_rules_lists_options',
+        'description' => t('Ids of the lists to add the contact to'),
+      ),
+    ),
+    'group' => t('SendinBlue'),
+  );
+
   $items['sendinblue_attribute_add_to_list'] = array(
     'label' => t('Add SendinBlue attribute to list'),
     'parameter' => array(
@@ -155,8 +174,6 @@ function sendinblue_rules_lists_options() {
 }
 
 function sendinblue_create_contact($account, $lists, $attributes) {
-  module_load_include('inc', 'sendinblue_rules', 'includes/sendinblue_rules.list');
-  $all_lists = sendinblue_rules_get_lists();
   $success = false;
   
   $mailin = sendinblue_rules_get_client();
@@ -171,34 +188,39 @@ function sendinblue_create_contact($account, $lists, $attributes) {
     $data['listid'][] = $list;
   }
   
-  $result = $mailin->get("contacts/{$account->mail}" , NULL);
-  if (isset($result['email'])) {
-    $data = array_replace_recursive($result, $data);
-    $result = $mailin->put("contacts/{$account->mail}" , $data);
-    // TODO: determine success.
-    $success = TRUE;
+
+  $data['email'] = $account->mail;
+  $result = $mailin->post('contacts', json_encode($data));
+  $success = isset($result['id']);
+
+  if (!$success) {
+    watchdog('sendinblue', t('Contact for email @email could not be created', array('@email' => $account->mail)));
   }
-  else {
-    $data['email'] = $account->mail;
-    $result = $mailin->post('contacts', json_encode($data));
-    $success = isset($result['id']);
+}
+
+function sendinblue_update_contact($email, $attributes, $listIds) {
+  module_load_include('inc', 'sendinblue_rules', 'includes/sendinblue_rules.list');
+  $all_lists = sendinblue_rules_get_lists();
+  $success = false;
+  
+  $mailin = sendinblue_rules_get_client();
+  $data = array();
+
+  foreach ($attributes as $attribute) {
+    $data['attributes'][$attribute['name']] = $attribute['value'];
   }
 
-  if ($success) {
-    $names = array();
-    foreach ($lists as $list_id) {
-      $names[] = "{$all_lists[$list_id]['name']} ($list_id)";
-    }
-    watchdog(
-      'sendinblue',
-      t(
-        'User @username (@uid) could not be added to mailing list(s): @lists.',
-        array(
-          '@username' => $account->name, '@uid' => $account->uid,
-          '@lists' => implode(' ', $names),
-        )
-      )
-    );
+  $data['listid'] = array();
+  foreach ($listIds as $list) {
+    $data['listid'][] = $list;
+  }
+
+  $result = $mailin->put("contacts/{$email}" , $data);
+  // TODO: determine success.
+  $success = TRUE;
+
+  if (!$success) {
+    watchdog('sendinblue', t('Contact for email @email could not be updated', array('@email' => $email)));
   }
 }
 
