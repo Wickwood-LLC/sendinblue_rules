@@ -69,7 +69,7 @@ function sendinblue_rules_rules_action_info() {
   $items = array();
 
   $items['sendinblue_create_contact'] = array(
-    'label' => t('Create contact'),
+    'label' => t('Create a SendinBlue contact'),
     'parameter' => array(
       'account' => array('type' => 'user', 'label' => t('Subscriber')),
       'lists' => array(
@@ -86,7 +86,7 @@ function sendinblue_rules_rules_action_info() {
   );
 
   $items['sendinblue_update_contact'] = array(
-    'label' => t('Update contact'),
+    'label' => t('Update a SendinBlue contact'),
     'parameter' => array(
       'email' => array('type' => 'text', 'label' => t('Email')),
       'attributes' => array(
@@ -151,7 +151,7 @@ function sendinblue_rules_rules_action_info() {
   );
   
   $items['sendinblue_list_add_remove_contacts'] = array(
-    'label' => t('Add/remove contacts to/from list'),
+    'label' => t('Add/remove SendinBlue contacts to/from list'),
     'parameter' => array(
       'emails' => array(
         'type' => 'list<text>',
