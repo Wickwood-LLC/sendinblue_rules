@@ -99,6 +99,7 @@ function sendinblue_rules_rules_action_info() {
         'label' => t('Lists'),
         'options list' => 'sendinblue_rules_lists_options',
         'description' => t('Ids of the lists to add the contact to'),
+        'optional' => TRUE,
       ),
     ),
     'group' => t('SendinBlue'),
