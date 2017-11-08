@@ -59,6 +59,54 @@ function sendinblue_rules_rules_data_info() {
         ),
       ),
     ),
+    'sendinblue_contact' => array(
+      'label' => t('SendinBlue Contact'),
+      'group' => t('SendinBlue'),
+      'property info' => array(
+        'email' => array(
+          'type' => 'text',
+          'label' => t('Email'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+        'id' => array(
+          'type' => 'int',
+          'label' => t('ID'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+        'emailBlacklisted' => array(
+          'type' => 'boolean',
+          'label' => t('Email blacklisted'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+        'smsBlacklisted' => array(
+          'type' => 'boolean',
+          'label' => t('SMS blacklisted'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+        'modifiedAt' => array(
+          'type' => 'text',
+          'label' => t('Modified at'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+        'attributes' => array(
+          'type' => 'list<sendinblue_attribute>',
+          'label' => t('Attributes'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+        'listIds' => array(
+          'type' => 'list<int>',
+          'label' => t('List IDs'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+      ),
+    ),
   );
 }
 
