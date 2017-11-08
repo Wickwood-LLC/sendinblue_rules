@@ -96,11 +96,18 @@ function sendinblue_rules_rules_action_info() {
       ),
       'listIds' => array(
         'type' => 'list<text>',
-        'label' => t('Lists'),
+        'label' => t('Lists to add to'),
         'options list' => 'sendinblue_rules_lists_options',
         'description' => t('Ids of the lists to add the contact to'),
         'optional' => TRUE,
       ),
+      'unlinkListIds' => array(
+        'type' => 'list<text>',
+        'label' => t('Lists to remove from'),
+        'options list' => 'sendinblue_rules_lists_options',
+        'description' => t('Ids of the lists to remove the contact from'),
+        'optional' => TRUE,
+      )
     ),
     'group' => t('SendinBlue'),
   );
@@ -199,7 +206,7 @@ function sendinblue_create_contact($account, $lists, $attributes) {
   }
 }
 
-function sendinblue_update_contact($email, $attributes, $listIds) {
+function sendinblue_update_contact($email, $attributes, $listIds, $unlinkListIds) {
   module_load_include('inc', 'sendinblue_rules', 'includes/sendinblue_rules.list');
   $all_lists = sendinblue_rules_get_lists();
   $success = false;
@@ -211,10 +218,8 @@ function sendinblue_update_contact($email, $attributes, $listIds) {
     $data['attributes'][$attribute['name']] = $attribute['value'];
   }
 
-  $data['listid'] = array();
-  foreach ($listIds as $list) {
-    $data['listid'][] = $list;
-  }
+  $data['listid'] = is_array($listIds) ? $listIds : array();
+  $data['unlinkListIds'] = is_array($unlinkListIds) ? $unlinkListIds : array();
 
   $result = $mailin->put("contacts/{$email}" , $data);
   // TODO: determine success.
