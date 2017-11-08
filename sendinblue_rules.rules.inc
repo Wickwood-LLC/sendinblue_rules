@@ -93,6 +93,7 @@ function sendinblue_rules_rules_action_info() {
         'type' => 'list<sendinblue_attribute>',
         'label' => t('Attributes'),
         'description' => t('Values of the attributes to fill. The attributes must exist in you contact database'),
+        'optional' => TRUE,
       ),
       'listIds' => array(
         'type' => 'list<text>',
@@ -214,6 +215,7 @@ function sendinblue_update_contact($email, $attributes, $listIds, $unlinkListIds
   $mailin = sendinblue_rules_get_client();
   $data = array();
 
+  $attributes = is_array($attributes) ? $attributes : array();
   foreach ($attributes as $attribute) {
     $data['attributes'][$attribute['name']] = $attribute['value'];
   }
