@@ -76,10 +76,12 @@ function sendinblue_rules_rules_action_info() {
         'type' => 'list<text>',
         'label' => t('Lists'),
         'options list' => 'sendinblue_rules_lists_options',
+        'optional' => TRUE,
       ),
       'attributes' => array(
         'type' => 'list<sendinblue_attribute>',
         'label' => t('Attributes'),
+        'optional' => TRUE,
       ),
     ),
     'group' => t('SendinBlue'),
