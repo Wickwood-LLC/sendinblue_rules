@@ -72,16 +72,30 @@ function sendinblue_rules_rules_action_info() {
     'label' => t('Create a SendinBlue contact'),
     'parameter' => array(
       'account' => array('type' => 'user', 'label' => t('Subscriber')),
+      'attributes' => array(
+        'type' => 'list<sendinblue_attribute>',
+        'label' => t('Attributes'),
+        'optional' => TRUE,
+        'description' => t('Values of the attributes to fill. The attributes must exist at SendinBlue contact database')
+      ),
+      'emailBlacklisted' => array(
+        'type' => 'boolean',
+        'label' => t('Email blacklisted'),
+        'description' => t('Blacklist the contact for emails.'),
+        'optional' => TRUE,
+      ),
+      'smsBlacklisted' => array(
+        'type' => 'boolean',
+        'label' => t('SMS blacklisted'),
+        'description' => t('Blacklist the contact for SMS.'),
+        'optional' => TRUE,
+      ),
       'lists' => array(
         'type' => 'list<text>',
         'label' => t('Lists'),
         'options list' => 'sendinblue_rules_lists_options',
         'optional' => TRUE,
-      ),
-      'attributes' => array(
-        'type' => 'list<sendinblue_attribute>',
-        'label' => t('Attributes'),
-        'optional' => TRUE,
+        'description' => t('Ids of the lists to add the contact to'),
       ),
       'updateEnabled' => array(
         'type' => 'boolean',
@@ -190,7 +204,7 @@ function sendinblue_rules_lists_options() {
   return $options;
 }
 
-function sendinblue_create_contact($account, $lists, $attributes, $updateEnabled) {
+function sendinblue_create_contact($account, $attributes, $emailBlacklisted, $smsBlacklisted, $lists, $updateEnabled) {
   $success = false;
   
   $mailin = sendinblue_rules_get_client();
@@ -198,6 +212,13 @@ function sendinblue_create_contact($account, $lists, $attributes, $updateEnabled
 
   foreach ($attributes as $attribute) {
     $data['attributes'][$attribute['name']] = $attribute['value'];
+  }
+
+  if ($emailBlacklisted === TRUE) {
+    $data['emailBlacklisted'] = TRUE;
+  }
+  if ($smsBlacklisted === TRUE) {
+    $data['smsBlacklisted'] = TRUE;
   }
 
   $data['listid'] = array();
