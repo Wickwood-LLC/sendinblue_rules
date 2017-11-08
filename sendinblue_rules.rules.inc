@@ -68,7 +68,7 @@ function sendinblue_rules_rules_data_info() {
 function sendinblue_rules_rules_action_info() {
   $items = array();
 
-  $items['sendinblue_add_user_to_list'] = array(
+  $items['sendinblue_create_contact'] = array(
     'label' => t('Add a user to lists'),
     'parameter' => array(
       'account' => array('type' => 'user', 'label' => t('Subscriber')),
@@ -104,7 +104,44 @@ function sendinblue_rules_rules_action_info() {
     ),
     'group' => t('SendinBlue'),
   );
+
+  $items['sendinblue_retrieve_contact_info'] = array(
+    'label' => t('Retrieve SendinBlue contact info'),
+    'parameter' => array(
+      'email' => array(
+        'type' => 'text',
+        'label' => t('Email address'),
+      ),
+    ),
+    'provides' => array(
+      'contact_info' => array(
+        'type' => 'text',
+        'label' => t('Serialized contact info')
+      ),
+    ),
+    'group' => t('SendinBlue'),
+  );
   
+  $items['sendinblue_list_add_remove_contacts'] = array(
+    'label' => t('Add/remove contacts to/from list'),
+    'parameter' => array(
+      'emails' => array(
+        'type' => 'list<text>',
+        'label' => t('Email addresses'),
+      ),
+      'list' => array(
+        'type' => 'text',
+        'label' => t('List ID'),
+      ),
+      'operation' => array(
+        'type' => 'text',
+        'label' => t('Action'),
+        'options list' => 'sendinblue_rules_lists_action_options',
+      ),
+    ),
+    'group' => t('SendinBlue'),
+  );
+
   return $items;
 }
 
@@ -117,7 +154,7 @@ function sendinblue_rules_lists_options() {
   return $options;
 }
 
-function sendinblue_add_user_to_list($account, $lists, $attributes) {
+function sendinblue_create_contact($account, $lists, $attributes) {
   module_load_include('inc', 'sendinblue_rules', 'includes/sendinblue_rules.list');
   $all_lists = sendinblue_rules_get_lists();
   $success = false;
@@ -173,3 +210,26 @@ function sendinblue_attribute_add_to_list($attributes, $name, $value) {
   return array('attributes' => $attributes);
 }
 
+function sendinblue_retrieve_contact_info($email) {
+  $contact_info = NULL;
+  $mailin = sendinblue_rules_get_client();
+  $result = $mailin->get("contacts/{$email}" , NULL);
+  if (isset($result['email'])) {
+    $contact_info = serialize($result);
+  }
+
+  return array('contact_info' => $contact_info);
+}
+
+function sendinblue_rules_lists_action_options() {
+  return array(
+    'add' => t('Add'),
+    'remove' => t('Remove'),
+  );
+}
+
+function sendinblue_list_add_remove_contact($emails, $list, $operation) {
+  $mailin = sendinblue_rules_get_client();
+  $result = $mailin->post("contacts/lists/{$list}/contacts/{$operation}" , array('emails' => $emails));
+  // TODO: determine success.
+}
