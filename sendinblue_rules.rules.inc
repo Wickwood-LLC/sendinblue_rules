@@ -369,6 +369,24 @@ function sendinblue_rules_rules_action_info() {
   return $items;
 }
 
+/**
+ * Implements hook_rules_condition_info().
+ */
+function sendinblue_rules_rules_condition_info() {
+  return array(
+    'sendinblue_is_contact_info_valid' => array(
+      'label' => t('Is valid SendinBlue contact info'),
+      'parameter' => array(
+        'contact' => array(
+          'label' => t('SendinBlue Contact'),
+          'type' => 'sendinblue_contact'
+        ),
+      ),
+      'group' => t('SendinBlue'),
+    ),
+  );
+}
+
 function sendinblue_rules_lists_options() {
   module_load_include('inc', 'sendinblue_rules', 'includes/sendinblue_rules.list');
   $options = array();
@@ -467,4 +485,8 @@ function sendinblue_list_add_remove_contact($emails, $list, $operation) {
   $mailin = sendinblue_rules_get_client();
   $result = $mailin->post("contacts/lists/{$list}/contacts/{$operation}" , array('emails' => $emails));
   // TODO: determine success.
+}
+
+function sendinblue_is_contact_info_valid($contact) {
+  return isset($contact['id']);
 }
