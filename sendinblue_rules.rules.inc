@@ -59,6 +59,126 @@ function sendinblue_rules_rules_data_info() {
         ),
       ),
     ),
+    'sendinblue_message_sent_event' => array(
+      'label' => t('SendinBlue Message Sent Event'),
+      'group' => t('SendinBlue'),
+      'property info' => array(
+        'campaignId' => array(
+          'type' => 'int',
+          'label' => t('Campaign Id'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+        'eventTime' => array(
+          'type' => 'text',
+          'label' => t('Event Time'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+      ),
+    ),
+    'sendinblue_opened_event' => array(
+      'label' => t('SendinBlue Opened Event'),
+      'group' => t('SendinBlue'),
+      'property info' => array(
+        'campaignId' => array(
+          'type' => 'int',
+          'label' => t('Campaign Id'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+        'count' => array(
+          'type' => 'int',
+          'label' => t('Count'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+        'eventTime' => array(
+          'type' => 'text',
+          'label' => t('Event Time'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+        'ip' => array(
+          'type' => 'text',
+          'label' => t('IP'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+      ),
+    ),
+    'sendinblue_clicked_event' => array(
+      'label' => t('SendinBlue Clicked Event'),
+      'group' => t('SendinBlue'),
+      'property info' => array(
+        'count' => array(
+          'type' => 'int',
+          'label' => t('Count'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+        'eventTime' => array(
+          'type' => 'text',
+          'label' => t('Event Time'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+        'ip' => array(
+          'type' => 'text',
+          'label' => t('IP'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+        'url' => array(
+          'type' => 'text',
+          'label' => t('URL'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+      ),
+    ),
+    'sendinblue_clicked' => array(
+      'label' => t('SendinBlue Clicked'),
+      'group' => t('SendinBlue'),
+      'property info' => array(
+        'campaignId' => array(
+          'type' => 'int',
+          'label' => t('Campaign Id'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+        'links' => array(
+          'type' => 'list<sendinblue_clicked_event>',
+          'label' => t('Links'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+      ),
+    ),
+    'sendinblue_statistics' => array(
+      'label' => t('SendinBlue Statistics'),
+      'group' => t('SendinBlue'),
+      'property info' => array(
+        'messagesSent' => array(
+          'type' => 'list<sendinblue_message_sent_event>',
+          'label' => t('Messages Sent'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+        'opened' => array(
+          'type' => 'list<sendinblue_opened_event>',
+          'label' => t('Opens'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+        'clicked' => array(
+          'type' => 'list<sendinblue_clicked>',
+          'label' => t('Clicks'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+      ),
+    ),
     'sendinblue_contact' => array(
       'label' => t('SendinBlue Contact'),
       'group' => t('SendinBlue'),
@@ -102,6 +222,12 @@ function sendinblue_rules_rules_data_info() {
         'listIds' => array(
           'type' => 'list<int>',
           'label' => t('List IDs'),
+          'getter callback' => 'entity_property_verbatim_get',
+          'setter callback' => 'entity_property_verbatim_set',
+        ),
+        'statistics' => array(
+          'type' => 'sendinblue_statistics',
+          'label' => t('Statistics'),
           'getter callback' => 'entity_property_verbatim_get',
           'setter callback' => 'entity_property_verbatim_set',
         ),
@@ -213,8 +339,8 @@ function sendinblue_rules_rules_action_info() {
     ),
     'provides' => array(
       'contact_info' => array(
-        'type' => 'text',
-        'label' => t('Serialized contact info')
+        'type' => 'sendinblue_contact',
+        'label' => t('SendinBlue contact info')
       ),
     ),
     'group' => t('SendinBlue'),
@@ -324,7 +450,7 @@ function sendinblue_retrieve_contact_info($email) {
   $mailin = sendinblue_rules_get_client();
   $result = $mailin->get("contacts/{$email}" , NULL);
   if (isset($result['email'])) {
-    $contact_info = serialize($result);
+    $contact_info = $result;
   }
 
   return array('contact_info' => $contact_info);
