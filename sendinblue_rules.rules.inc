@@ -265,7 +265,7 @@ function sendinblue_rules_rules_action_info() {
         'optional' => TRUE,
       ),
       'lists' => array(
-        'type' => 'list<text>',
+        'type' => 'list<int>',
         'label' => t('Lists'),
         'options list' => 'sendinblue_rules_lists_options',
         'optional' => TRUE,
