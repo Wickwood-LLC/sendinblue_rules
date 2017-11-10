@@ -62,6 +62,8 @@ function sendinblue_rules_rules_data_info() {
     'sendinblue_message_sent_event' => array(
       'label' => t('SendinBlue Message Sent Event'),
       'group' => t('SendinBlue'),
+      'wrapper class' => 'SendinBlueAssociativeArrayWrapper',
+      'wrap' => TRUE,
       'property info' => array(
         'campaignId' => array(
           'type' => 'int',
@@ -80,6 +82,8 @@ function sendinblue_rules_rules_data_info() {
     'sendinblue_opened_event' => array(
       'label' => t('SendinBlue Opened Event'),
       'group' => t('SendinBlue'),
+      'wrapper class' => 'SendinBlueAssociativeArrayWrapper',
+      'wrap' => TRUE,
       'property info' => array(
         'campaignId' => array(
           'type' => 'int',
@@ -110,6 +114,8 @@ function sendinblue_rules_rules_data_info() {
     'sendinblue_clicked_event' => array(
       'label' => t('SendinBlue Clicked Event'),
       'group' => t('SendinBlue'),
+      'wrapper class' => 'SendinBlueAssociativeArrayWrapper',
+      'wrap' => TRUE,
       'property info' => array(
         'count' => array(
           'type' => 'int',
@@ -140,6 +146,8 @@ function sendinblue_rules_rules_data_info() {
     'sendinblue_clicked' => array(
       'label' => t('SendinBlue Clicked'),
       'group' => t('SendinBlue'),
+      'wrapper class' => 'SendinBlueAssociativeArrayWrapper',
+      'wrap' => TRUE,
       'property info' => array(
         'campaignId' => array(
           'type' => 'int',
@@ -158,6 +166,8 @@ function sendinblue_rules_rules_data_info() {
     'sendinblue_statistics' => array(
       'label' => t('SendinBlue Statistics'),
       'group' => t('SendinBlue'),
+      'wrapper class' => 'SendinBlueAssociativeArrayWrapper',
+      'wrap' => TRUE,
       'property info' => array(
         'messagesSent' => array(
           'type' => 'list<sendinblue_message_sent_event>',
@@ -182,6 +192,19 @@ function sendinblue_rules_rules_data_info() {
     'sendinblue_contact' => array(
       'label' => t('SendinBlue Contact'),
       'group' => t('SendinBlue'),
+      'wrapper class' => 'SendinBlueAssociativeArrayWrapper',
+      'wrap' => TRUE,
+      'property defaults' => array(
+        'email' => NULL,
+        'id' => NULL,
+        'emailBlacklisted' => NULL,
+        'smsBlacklisted' => NULL,
+        'modifiedAt' => NULL,
+        'attributes' => array(),
+        'smsBlacklisted' => NULL,
+        'listIds' => array(),
+        'statistics' => NULL,
+      ),
       'property info' => array(
         'email' => array(
           'type' => 'text',
@@ -379,7 +402,8 @@ function sendinblue_rules_rules_condition_info() {
       'parameter' => array(
         'contact' => array(
           'label' => t('SendinBlue Contact'),
-          'type' => 'sendinblue_contact'
+          'type' => 'sendinblue_contact',
+          'allow null' => TRUE,
         ),
       ),
       'group' => t('SendinBlue'),
@@ -443,10 +467,15 @@ function sendinblue_update_contact($email, $attributes, $listIds, $unlinkListIds
     $data['attributes'][$attribute['name']] = $attribute['value'];
   }
 
-  $data['listid'] = is_array($listIds) ? $listIds : array();
-  $data['unlinkListIds'] = is_array($unlinkListIds) ? $unlinkListIds : array();
+  if (is_array($listIds)) {
+    $data['listid'] = $listIds;
+  }
+  if (is_array($unlinkListIds)) {
+    $data['unlinkListIds'] =  $unlinkListIds;
+  }
 
-  $result = $mailin->put("contacts/{$email}" , $data);
+  $encoded_email = urlencode($email);
+  $result = $mailin->put("contacts/{$encoded_email}" , $data);
   // TODO: determine success.
   $success = TRUE;
 
@@ -466,7 +495,9 @@ function sendinblue_attribute_add_to_list($attributes, $name, $value) {
 function sendinblue_retrieve_contact_info($email) {
   $contact_info = NULL;
   $mailin = sendinblue_rules_get_client();
-  $result = $mailin->get("contacts/{$email}" , NULL);
+  $encoded_email = urlencode($email);
+  $result = $mailin->get("contacts/{$encoded_email}" , NULL);
+  watchdog('sendinblue', print_r($result, TRUE));
   if (isset($result['email'])) {
     $contact_info = $result;
   }
