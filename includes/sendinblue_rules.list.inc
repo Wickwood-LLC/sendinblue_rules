@@ -3,8 +3,8 @@
 
 function sendinblue_rules_get_lists() {
   $lists = array();
-
-  if ($cache = cache_get('sendinblue_rules_lists') && REQUEST_TIME < $cache->expire) {
+  $cache = cache_get('sendinblue_rules_lists');
+  if ($cache && REQUEST_TIME < $cache->expire) {
     $lists = $cache->data;
   }
   else {
