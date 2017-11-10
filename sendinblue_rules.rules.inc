@@ -268,7 +268,10 @@ function sendinblue_rules_rules_action_info() {
   $items['sendinblue_create_contact'] = array(
     'label' => t('Create a SendinBlue contact'),
     'parameter' => array(
-      'account' => array('type' => 'user', 'label' => t('Subscriber')),
+      'email' => array(
+        'type' => 'text',
+        'label' => t('Email')
+      ),
       'attributes' => array(
         'type' => 'list<sendinblue_attribute>',
         'label' => t('Attributes'),
@@ -436,7 +439,7 @@ function sendinblue_rules_lists_options() {
   return $options;
 }
 
-function sendinblue_create_contact($account, $attributes, $emailBlacklisted, $smsBlacklisted, $lists, $updateEnabled) {
+function sendinblue_create_contact($email, $attributes, $emailBlacklisted, $smsBlacklisted, $lists, $updateEnabled) {
   $success = false;
   
   $mailin = sendinblue_rules_get_client();
@@ -461,7 +464,7 @@ function sendinblue_create_contact($account, $attributes, $emailBlacklisted, $sm
     $data['updateEnabled'] = TRUE;
   }
 
-  $data['email'] = $account->mail;
+  $data['email'] = $email;
   $result = $mailin->post('contacts', json_encode($data));
   $success = isset($result['id']);
 
@@ -491,7 +494,7 @@ function sendinblue_update_contact($email, $attributes, $listIds, $unlinkListIds
   }
 
   $encoded_email = urlencode($email);
-  $result = $mailin->put("contacts/{$encoded_email}" , $data);
+  $result = $mailin->put("contacts/{$encoded_email}" , json_encode($data));
   // TODO: determine success.
   $success = TRUE;
 
