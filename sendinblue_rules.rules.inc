@@ -243,7 +243,7 @@ function sendinblue_rules_rules_data_info() {
           'setter callback' => 'entity_property_verbatim_set',
         ),
         'listIds' => array(
-          'type' => 'list<int>',
+          'type' => 'list<integer>',
           'label' => t('List IDs'),
           'getter callback' => 'entity_property_verbatim_get',
           'setter callback' => 'entity_property_verbatim_set',
@@ -291,7 +291,7 @@ function sendinblue_rules_rules_action_info() {
         'optional' => TRUE,
       ),
       'lists' => array(
-        'type' => 'list<int>',
+        'type' => 'list<integer>',
         'label' => t('Lists'),
         'options list' => 'sendinblue_rules_lists_options',
         'optional' => TRUE,
@@ -318,14 +318,14 @@ function sendinblue_rules_rules_action_info() {
         'optional' => TRUE,
       ),
       'listIds' => array(
-        'type' => 'list<text>',
+        'type' => 'list<integer>',
         'label' => t('Lists to add to'),
         'options list' => 'sendinblue_rules_lists_options',
         'description' => t('Ids of the lists to add the contact to'),
         'optional' => TRUE,
       ),
       'unlinkListIds' => array(
-        'type' => 'list<text>',
+        'type' => 'list<integer>',
         'label' => t('Lists to remove from'),
         'options list' => 'sendinblue_rules_lists_options',
         'description' => t('Ids of the lists to remove the contact from'),
@@ -350,6 +350,7 @@ function sendinblue_rules_rules_action_info() {
       'value' => array(
         'type' => 'text',
         'label' => t('Attribute Value'),
+        'allow null' => TRUE,
       ),
     ),
     'group' => t('SendinBlue'),
@@ -434,13 +435,12 @@ function sendinblue_rules_lists_options() {
   module_load_include('inc', 'sendinblue_rules', 'includes/sendinblue_rules.list');
   $options = array();
   foreach (sendinblue_rules_get_lists() as $list) {
-    $options[$list['id']] = $list['name'];
+    $options[(int)$list['id']] = $list['name'];
   }
   return $options;
 }
 
 function sendinblue_create_contact($email, $attributes, $emailBlacklisted, $smsBlacklisted, $lists, $updateEnabled) {
-  $success = false;
   
   $mailin = sendinblue_rules_get_client();
   $data = array();
@@ -456,10 +456,8 @@ function sendinblue_create_contact($email, $attributes, $emailBlacklisted, $smsB
     $data['smsBlacklisted'] = TRUE;
   }
 
-  $data['listid'] = array();
-  foreach ($lists as $list) {
-    $data['listid'][] = $list;
-  }
+  $data['listIds'] = is_array($lists) ? array_values(array_map('intval', $lists)) : array();
+
   if ($updateEnabled === TRUE) {
     $data['updateEnabled'] = TRUE;
   }
@@ -476,7 +474,6 @@ function sendinblue_create_contact($email, $attributes, $emailBlacklisted, $smsB
 function sendinblue_update_contact($email, $attributes, $listIds, $unlinkListIds) {
   module_load_include('inc', 'sendinblue_rules', 'includes/sendinblue_rules.list');
   $all_lists = sendinblue_rules_get_lists();
-  $success = false;
   
   $mailin = sendinblue_rules_get_client();
   $data = array();
@@ -486,17 +483,13 @@ function sendinblue_update_contact($email, $attributes, $listIds, $unlinkListIds
     $data['attributes'][$attribute['name']] = $attribute['value'];
   }
 
-  if (is_array($listIds)) {
-    $data['listid'] = $listIds;
-  }
-  if (is_array($unlinkListIds)) {
-    $data['unlinkListIds'] =  $unlinkListIds;
-  }
+  $data['listIds'] = is_array($listIds) ? array_values(array_map('intval', $listIds)) : array();
+  $data['unlinkListIds'] = is_array($unlinkListIds) ? array_values(array_map('intval', $unlinkListIds)) : array();
 
   $encoded_email = urlencode($email);
   $result = $mailin->put("contacts/{$encoded_email}" , json_encode($data));
-  // TODO: determine success.
-  $success = TRUE;
+  // Nothing will be return if it was success.
+  $success = !isset($result);
 
   if (!$success) {
     watchdog('sendinblue', t('Contact for email @email could not be updated', array('@email' => $email)));
@@ -508,13 +501,24 @@ function sendinblue_update_contact($email, $attributes, $listIds, $unlinkListIds
  */
 function sendinblue_attribute_add_to_list($attributes, $name, $value) {
   $attributes[] = array ('name' => $name, 'value' => $value);
+  $found = false;
+  foreach ($attributes as $index => $attribute) {
+    if ($attribute['name'] == $name) {
+      $attributes[$index]['value'] = $value;
+      $found = TRUE;
+    }
+  }
+
+  if (!$found) {
+    $attributes[] = array('name' => $name, 'value' => $value);
+  }
   return array('attributes' => $attributes);
 }
 
 function sendinblue_attribute_remove_from_list($attributes, $name) {
-  foreach ($attributes as &$attribute) {
+  foreach ($attributes as $index => $attribute) {
     if ($attribute['name'] == $name) {
-      unset($attribute);
+      unset($attributes[$index]);
       break;
     }
   }
