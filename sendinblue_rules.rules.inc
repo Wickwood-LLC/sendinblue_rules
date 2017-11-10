@@ -352,6 +352,22 @@ function sendinblue_rules_rules_action_info() {
     'group' => t('SendinBlue'),
   );
 
+  $items['sendinblue_attribute_remove_from_list'] = array(
+    'label' => t('Remove SendinBlue attribute from list'),
+    'parameter' => array(
+      'attributes' => array(
+        'type' => 'list<sendinblue_attribute>',
+        'label' => t('Attributes List'),
+        'save' => TRUE,
+      ),
+      'name' => array(
+        'type' => 'text',
+        'label' => t('Attribute Name'),
+      ),
+    ),
+    'group' => t('SendinBlue'),
+  );
+
   $items['sendinblue_retrieve_contact_info'] = array(
     'label' => t('Retrieve SendinBlue contact info'),
     'parameter' => array(
@@ -490,6 +506,15 @@ function sendinblue_update_contact($email, $attributes, $listIds, $unlinkListIds
 function sendinblue_attribute_add_to_list($attributes, $name, $value) {
   $attributes[] = array ('name' => $name, 'value' => $value);
   return array('attributes' => $attributes);
+}
+
+function sendinblue_attribute_remove_from_list($attributes, $name) {
+  foreach ($attributes as &$attribute) {
+    if ($attribute['name'] == $name) {
+      unset($attribute);
+      break;
+    }
+  }
 }
 
 function sendinblue_retrieve_contact_info($email) {
