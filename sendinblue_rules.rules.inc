@@ -372,6 +372,22 @@ function sendinblue_rules_rules_action_info() {
     'group' => t('SendinBlue'),
   );
 
+  $items['sendinblue_attribute_set_null'] = array(
+    'label' => t('Set NULL for a SendinBlue attribute in list'),
+    'parameter' => array(
+      'attributes' => array(
+        'type' => 'list<sendinblue_attribute>',
+        'label' => t('Attributes List'),
+        'save' => TRUE,
+      ),
+      'name' => array(
+        'type' => 'text',
+        'label' => t('Attribute Name'),
+      ),
+    ),
+    'group' => t('SendinBlue'),
+  );
+
   $items['sendinblue_retrieve_contact_info'] = array(
     'label' => t('Retrieve SendinBlue contact info'),
     'parameter' => array(
@@ -523,6 +539,13 @@ function sendinblue_attribute_remove_from_list($attributes, $name) {
     }
   }
   return array('attributes' => $attributes);
+}
+
+/**
+ * It is basically a wrapper as it would be unable to pass null value by Rules UI.
+ */
+function sendinblue_attribute_set_null($attributes, $name) {
+  return sendinblue_attribute_add_to_list($attributes, $name, NULL);
 }
 
 function sendinblue_retrieve_contact_info($email) {
