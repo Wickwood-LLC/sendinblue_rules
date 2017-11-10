@@ -518,6 +518,7 @@ function sendinblue_attribute_remove_from_list($attributes, $name) {
       break;
     }
   }
+  return array('attributes' => $attributes);
 }
 
 function sendinblue_retrieve_contact_info($email) {
@@ -528,6 +529,14 @@ function sendinblue_retrieve_contact_info($email) {
   watchdog('sendinblue', print_r($result, TRUE));
   if (isset($result['email'])) {
     $contact_info = $result;
+    if (isset($contact_info['attributes'])) {
+      // Attributes to be converted to our data type format.
+      $attributes = array();
+      foreach ($contact_info['attributes'] as $name => $value) {
+        $attributes[] = array('name' => $name, 'value' => $value);
+      }
+      $contact_info['attributes'] = $attributes;
+    }
   }
 
   return array('contact_info' => $contact_info);
@@ -542,7 +551,7 @@ function sendinblue_rules_lists_action_options() {
 
 function sendinblue_list_add_remove_contact($emails, $list, $operation) {
   $mailin = sendinblue_rules_get_client();
-  $result = $mailin->post("contacts/lists/{$list}/contacts/{$operation}" , array('emails' => $emails));
+  $result = $mailin->post("contacts/lists/{$list}/contacts/{$operation}" , json_encode(array('emails' => $emails)));
   // TODO: determine success.
 }
 
