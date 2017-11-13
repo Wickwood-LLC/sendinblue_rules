@@ -201,7 +201,6 @@ function sendinblue_rules_rules_data_info() {
         'smsBlacklisted' => NULL,
         'modifiedAt' => NULL,
         'attributes' => array(),
-        'smsBlacklisted' => NULL,
         'listIds' => array(),
         'statistics' => NULL,
       ),
