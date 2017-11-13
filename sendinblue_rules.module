@@ -6,13 +6,6 @@ define('SENDINBLUE_API_V3_URL', 'https://api.sendinblue.com/v3');
  * Implements hook_menu().
  */
 function sendinblue_rules_menu() {
-  $items['admin/config/bwma'] = array(
-    'title' => 'BWMA Settings',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('bwma_admin_settings_form'),
-    'access arguments' => array('administer site configuration'),
-    'file' => 'includes/admin_page.inc',
-  );
   $items['admin/config/system/sendinblue/api3'] = array(
     'title' => 'API v3.0',
     'description' => 'API v3.0 configurations.',
