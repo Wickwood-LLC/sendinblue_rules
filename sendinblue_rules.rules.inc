@@ -424,6 +424,34 @@ function sendinblue_rules_rules_action_info() {
     'group' => t('SendinBlue'),
   );
 
+  $items['sendinblue_add_remove_lists_from_list'] = array(
+    'label' => t('Add/Remove SendinBlue lists from given list of lists'),
+    'parameter' => array(
+      'listIds' => array(
+        'type' => 'list<integer>',
+        'label' => t('SendinBlue lists'),
+        'description' => t('Ids of the SendinBlue lists'),
+        'optional' => FALSE,
+        'save' => TRUE,
+      ),
+      'listIdsToAdd' => array(
+        'type' => 'list<integer>',
+        'label' => t('List to include in list'),
+        'options list' => 'sendinblue_rules_lists_options',
+        'description' => t('Ids of the lists to include in list'),
+        'optional' => TRUE,
+      ),
+      'listIdsToRemove' => array(
+        'type' => 'list<integer>',
+        'label' => t('List to exclude from list'),
+        'options list' => 'sendinblue_rules_lists_options',
+        'description' => t('Ids of the lists to exclude from list'),
+        'optional' => TRUE,
+      ),
+    ),
+    'group' => t('SendinBlue'),
+  );
+
   return $items;
 }
 
@@ -583,4 +611,10 @@ function sendinblue_list_add_remove_contact($emails, $list, $operation) {
 
 function sendinblue_is_contact_info_valid($contact) {
   return isset($contact['id']);
+}
+
+function sendinblue_add_remove_lists_from_list($listIds, $listIdsToAdd, $listIdsToRemove) {
+  $listIds += $listIdsToAdd;
+  $listIds = array_diff($listIds, $listIdsToRemove);
+  return array('listIds' => $listIds);
 }
