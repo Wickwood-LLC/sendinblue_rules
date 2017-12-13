@@ -335,7 +335,7 @@ function sendinblue_rules_rules_action_info() {
   );
 
   $items['sendinblue_attribute_add_to_list'] = array(
-    'label' => t('Add SendinBlue attribute to list'),
+    'label' => t('Add/Update SendinBlue attribute to list'),
     'parameter' => array(
       'attributes' => array(
         'type' => 'list<sendinblue_attribute>',
@@ -350,6 +350,28 @@ function sendinblue_rules_rules_action_info() {
         'type' => 'text',
         'label' => t('Attribute Value'),
         'allow null' => TRUE,
+      ),
+    ),
+    'group' => t('SendinBlue'),
+  );
+
+  $items['sendinblue_attribute_get_value'] = array(
+    'label' => t('Get SendinBlue attribute value from list'),
+    'parameter' => array(
+      'attributes' => array(
+        'type' => 'list<sendinblue_attribute>',
+        'label' => t('Attributes List'),
+        'save' => TRUE,
+      ),
+      'name' => array(
+        'type' => 'text',
+        'label' => t('Attribute Name'),
+      ),
+    ),
+    'provides' => array(
+      'value' => array(
+        'type' => 'text',
+        'label' => t('Attribute Value'),
       ),
     ),
     'group' => t('SendinBlue'),
@@ -543,7 +565,6 @@ function sendinblue_update_contact($email, $attributes, $listIds, $unlinkListIds
  * Rules action callback.
  */
 function sendinblue_attribute_add_to_list($attributes, $name, $value) {
-  $attributes[] = array ('name' => $name, 'value' => $value);
   $found = false;
   foreach ($attributes as $index => $attribute) {
     if ($attribute['name'] == $name) {
@@ -556,6 +577,17 @@ function sendinblue_attribute_add_to_list($attributes, $name, $value) {
     $attributes[] = array('name' => $name, 'value' => $value);
   }
   return array('attributes' => $attributes);
+}
+
+function sendinblue_attribute_get_value($attributes, $name) {
+  $value = NULL;
+  foreach ($attributes as $index => $attribute) {
+    if ($attribute['name'] == $name) {
+      $value = $attributes[$index]['value'];
+    }
+  }
+
+  return array('value' => $value);
 }
 
 function sendinblue_attribute_remove_from_list($attributes, $name) {
