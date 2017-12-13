@@ -612,7 +612,6 @@ function sendinblue_retrieve_contact_info($email) {
   $mailin = sendinblue_rules_get_client();
   $encoded_email = urlencode($email);
   $result = $mailin->get("contacts/{$encoded_email}" , NULL);
-  watchdog('sendinblue', print_r($result, TRUE));
   if (isset($result['email'])) {
     $contact_info = $result;
     if (isset($contact_info['attributes'])) {
