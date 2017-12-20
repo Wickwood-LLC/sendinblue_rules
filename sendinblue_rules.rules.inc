@@ -551,7 +551,11 @@ function sendinblue_update_contact($email, $attributes, $listIds, $unlinkListIds
   $data['listIds'] = is_array($listIds) ? array_values(array_map('intval', $listIds)) : array();
   $data['unlinkListIds'] = is_array($unlinkListIds) ? array_values(array_map('intval', $unlinkListIds)) : array();
 
-  $encoded_email = urlencode($email);
+  // Ensure email address are in lowercase since SendinBlue converts email
+  // address to lowercase when stored.
+  // So, SendinBlue will report contact does not exist if email address passed
+  // here has capital letters in it.
+  $encoded_email = urlencode(strtolower($email));
   $result = $mailin->put("contacts/{$encoded_email}" , json_encode($data));
   // Nothing will be return if it was success.
   $success = !isset($result);
