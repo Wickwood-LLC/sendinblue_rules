@@ -610,7 +610,11 @@ function sendinblue_attribute_set_null($attributes, $name) {
 function sendinblue_retrieve_contact_info($email) {
   $contact_info = NULL;
   $mailin = sendinblue_rules_get_client();
-  $encoded_email = urlencode($email);
+  // Ensure email address are in lowercase since SendinBlue converts email
+  // address to lowercase when stored.
+  // So, SendinBlue will report contact does not exist if email address passed
+  // here has capital letters in it.
+  $encoded_email = urlencode(strtolower($email));
   $result = $mailin->get("contacts/{$encoded_email}" , NULL);
   if (isset($result['email'])) {
     $contact_info = $result;
